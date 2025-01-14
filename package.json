@@ -1,0 +1,29 @@
+{
+    "name": "create-typed-vite-react",
+    "version": "1.1.0",
+    "description": "CLI tool for creating TypeScript React projects with Vite",
+    "type": "module",
+    "bin": "./index.js",
+    "files": [
+        "index.js"
+    ],
+    "keywords": [
+        "react",
+        "typescript",
+        "vite",
+        "template",
+        "create"
+    ],
+    "author": "alphaorderly",
+    "license": "MIT",
+    "dependencies": {
+        "boxen": "^7.1.1",
+        "chalk": "^5.3.0",
+        "fs-extra": "^11.2.0",
+        "inquirer": "^9.2.12"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/alphaorderly/typed-vite-react-template.git"
+    }
+}
