@@ -13,17 +13,46 @@ const TEMPLATE_REPO =
 
 async function cloneTemplate(projectPath) {
   try {
-    // Check if directory exists
-    const exists = await fse.pathExists(projectPath);
-    if (exists) {
-      throw new Error(
-        `Directory ${projectPath} already exists. Please choose a different name or remove the existing directory.`
+    // Check if current directory
+    const isCurrentDir = projectPath === process.cwd();
+
+    // Only check directory existence if not current directory
+    if (!isCurrentDir) {
+      const exists = await fse.pathExists(projectPath);
+      if (exists) {
+        throw new Error(
+          `Directory ${projectPath} already exists. Please choose a different name or remove the existing directory.`
+        );
+      }
+    } else {
+      // Check if current directory is empty
+      const files = await fs.readdir(projectPath);
+      // Check for files/folders except .git and node_modules
+      const hasFiles = files.some(
+        (file) => file !== ".git" && file !== "node_modules"
       );
+      if (hasFiles) {
+        throw new Error(
+          "Current directory is not empty. Please use an empty directory."
+        );
+      }
     }
 
     console.log(chalk.blue("📦 Cloning template repository..."));
     try {
-      execSync(`git clone ${TEMPLATE_REPO} ${projectPath}`);
+      if (isCurrentDir) {
+        // For current directory, clone to temp dir first then move files
+        const tempDir = path.join(process.cwd(), ".temp-clone");
+        execSync(`git clone ${TEMPLATE_REPO} ${tempDir}`);
+        // Copy all files except node_modules
+        await fse.copy(tempDir, projectPath, {
+          filter: (src) => !src.includes("node_modules"),
+        });
+        // Remove temp directory
+        await fse.remove(tempDir);
+      } else {
+        execSync(`git clone ${TEMPLATE_REPO} ${projectPath}`);
+      }
     } catch (error) {
       if (error.message.includes("git")) {
         throw new Error(
@@ -32,7 +61,7 @@ async function cloneTemplate(projectPath) {
       }
       throw error;
     }
-    // Remove git history in a platform-independent way
+    // Remove git history
     await fse.remove(path.join(projectPath, ".git"));
     // Remove README.md file
     await fse.remove(path.join(projectPath, "README.md"));
