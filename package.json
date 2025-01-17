@@ -1,6 +1,6 @@
 {
     "name": "create-typed-vite-react",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "CLI tool for creating TypeScript React projects with Vite",
     "type": "module",
     "bin": "./index.js",
